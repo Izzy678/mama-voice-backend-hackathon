@@ -55,17 +55,12 @@ export class AuthService {
       email: body.email,
       password: hashedPassword,
       accountStatus: AccountStatusEnum.Active,
-      emailVerified: false,
+      emailVerified: true,
       profileCompleted: false,
     });
 
-    const otp = await this.issueAndSendOtp(user.id, user.email);
-
-    return {
-      message: 'Registration successful. Please verify your email with the OTP sent.',
-      email: user.email,
-      otp,
-    };
+    const { accessToken } = await this.buildAuthResponse(user);
+    return { token: accessToken, isExistingUser: false };
   }
 
   async verifyEmailOtp(body: VerifyEmailOtpBody) {
@@ -127,18 +122,20 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    await this.deviceService.registerOrUpdateOnLogin({
-      userId: user.id,
-      deviceId: body.deviceId,
-      platform: body.platform,
-      deviceModel: body.deviceModel,
-      pushNotificationToken: body.pushNotificationToken,
-    });
+    if (body.deviceId && body.platform) {
+      await this.deviceService.registerOrUpdateOnLogin({
+        userId: user.id,
+        deviceId: body.deviceId,
+        platform: body.platform,
+        deviceModel: body.deviceModel,
+        pushNotificationToken: body.pushNotificationToken,
+      });
+    }
 
     const loggedInAt = new Date();
     await this.loginAuditService.recordLoginWithRiskAssessment({
       userId: user.id,
-      deviceId: body.deviceId,
+      deviceId: body.deviceId ?? null,
       ipAddress: context.ipAddress,
       userAgent: context.userAgent,
       country: context.country,
@@ -151,7 +148,8 @@ export class AuthService {
       lastLoginAt: loggedInAt,
     });
 
-    return this.buildAuthResponse(user);
+    const { accessToken } = await this.buildAuthResponse(user);
+    return { token: accessToken, isExistingUser: true };
   }
 
 
