@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Req } from '@nestjs/common';
 import type { Request } from 'express';
 import {
+  ApiBadRequestResponse,
   ApiBody,
   ApiConflictResponse,
   ApiCreatedResponse,
@@ -14,19 +15,26 @@ import type {
   LoginBody,
   RefreshTokenBody,
   RegisterBody,
+  ResendOtpBody,
+  VerifyEmailOtpBody,
 } from '../dto/auth.dto';
 import {
   AuthResponseDto,
   LoginRequestDto,
+  OtpSentResponseDto,
   RefreshTokenRequestDto,
   RegisterRequestDto,
   RegisterResponseDto,
+  ResendOtpRequestDto,
+  VerifyEmailOtpRequestDto,
 } from '../dto/auth.swagger.dto';
 import { AuthService } from '../service/auth.service';
 import {
   loginValidator,
   refreshValidator,
   registerValidator,
+  resendOtpValidator,
+  verifyEmailOtpValidator,
 } from '../validation/auth.validation';
 import { getClientIp, getGeoFromRequest, getUserAgent } from '../../utils/request/request.util';
 import { LoginRequestContext } from '../../device/dto/device.dto';
@@ -45,6 +53,29 @@ export class AuthController {
     @Body(new JoiObjectValidationPipe(registerValidator)) body: RegisterBody,
   ) {
     return this.authService.register(body);
+  }
+
+  @Post('verify-email')
+  @ApiOperation({ summary: 'Verify email with OTP — returns token on success' })
+  @ApiBody({ type: VerifyEmailOtpRequestDto })
+  @ApiOkResponse({ type: AuthResponseDto })
+  @ApiBadRequestResponse({ description: 'Invalid or expired OTP' })
+  verifyEmailOtp(
+    @Body(new JoiObjectValidationPipe(verifyEmailOtpValidator))
+    body: VerifyEmailOtpBody,
+  ) {
+    return this.authService.verifyEmailOtp(body);
+  }
+
+  @Post('resend-otp')
+  @ApiOperation({ summary: 'Resend email verification OTP' })
+  @ApiBody({ type: ResendOtpRequestDto })
+  @ApiOkResponse({ type: OtpSentResponseDto })
+  @ApiBadRequestResponse({ description: 'Email already verified or not found' })
+  resendOtp(
+    @Body(new JoiObjectValidationPipe(resendOtpValidator)) body: ResendOtpBody,
+  ) {
+    return this.authService.resendOtp(body);
   }
 
   @Post('login')

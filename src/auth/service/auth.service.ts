@@ -55,12 +55,16 @@ export class AuthService {
       email: body.email,
       password: hashedPassword,
       accountStatus: AccountStatusEnum.Active,
-      emailVerified: true,
+      emailVerified: false,
       profileCompleted: false,
     });
 
-    const { accessToken } = await this.buildAuthResponse(user);
-    return { token: accessToken, isExistingUser: false };
+    const otp = await this.issueAndSendOtp(user.id, user.email);
+
+    return {
+      email: user.email,
+      otpId: otp.id,
+    };
   }
 
   async verifyEmailOtp(body: VerifyEmailOtpBody) {
@@ -83,7 +87,8 @@ export class AuthService {
       emailVerified: true,
     });
 
-    return this.buildAuthResponse(verifiedUser!);
+    const { accessToken, refreshToken } = await this.buildAuthResponse(verifiedUser!);
+    return { token: accessToken, refreshToken, isExistingUser: false };
   }
 
   async resendOtp(body: ResendOtpBody) {
@@ -99,9 +104,8 @@ export class AuthService {
     const otp = await this.issueAndSendOtp(user.id, user.email);
 
     return {
-      message: 'A new verification OTP has been sent to your email',
       email: user.email,
-      otp,
+      otpId: otp.id,
     };
   }
 
@@ -172,7 +176,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    return this.buildAuthResponse(user);
+    const { accessToken, refreshToken: newRefreshToken } = await this.buildAuthResponse(user);
+    return { token: accessToken, refreshToken: newRefreshToken };
   }
 
   private async issueAndSendOtp(userId: string, email: string) {
