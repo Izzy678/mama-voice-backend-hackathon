@@ -4,7 +4,7 @@ import {
     Injectable,
     UnauthorizedException,
 } from '@nestjs/common';
-import { Token } from 'src/auth/dto/auth.dto';
+import { Token } from '../../auth/dto/auth.dto';
 import { Response } from 'express';
 
 @Injectable()

@@ -4,9 +4,9 @@ import {
   NestMiddleware,
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { TokenService } from 'src/auth/service/token.service';
-import { TokenStatusCodeEnum } from 'src/auth/enum/auth.enum';
-import { DeviceService } from 'src/device/service/device.service';
+import { TokenService } from '../../auth/service/token.service';
+import { TokenStatusCodeEnum } from '../../auth/enum/auth.enum';
+import { DeviceService } from '../../device/service/device.service';
 import { AccountStatusEnum } from '../../user/enum/user.enum';
 import { getDeviceIdFromRequest } from '../request/request.util';
 

@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { DevicePlatformEnum } from 'src/device/enum/device.enum';
-import { OtpPurposeEnum } from 'src/otp/enum/otp.enum';
-import { UserProfileDto } from 'src/user/dto/user.swagger.dto';
+import { DevicePlatformEnum } from '../../device/enum/device.enum';
+import { OtpPurposeEnum } from '../../otp/enum/otp.enum';
+import { UserProfileDto } from '../../user/dto/user.swagger.dto';
 
 export class RegisterRequestDto {
   @ApiProperty({ example: 'user@example.com' })

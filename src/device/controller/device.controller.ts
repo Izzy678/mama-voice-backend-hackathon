@@ -13,9 +13,9 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JoiObjectValidationPipe } from 'src/utils/pipes/validation.pipe';
-import { TokenDataDecorator } from 'src/utils/decotator/token.decorator';
-import type { Token } from 'src/auth/dto/auth.dto';
+import { JoiObjectValidationPipe } from '../../utils/pipes/validation.pipe';
+import { TokenDataDecorator } from '../../utils/decotator/token.decorator';
+import type { Token } from '../../auth/dto/auth.dto';
 import type { UpdatePushTokenBody } from '../dto/device.dto';
 import {
   DeviceResponseDto,

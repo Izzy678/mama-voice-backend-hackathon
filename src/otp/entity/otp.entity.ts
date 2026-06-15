@@ -7,7 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UserEntity } from 'src/user/entity/user.entity';
+import { UserEntity } from '../../user/entity/user.entity';
 import { OtpPurposeEnum } from '../enum/otp.enum';
 
 @Entity('otps')

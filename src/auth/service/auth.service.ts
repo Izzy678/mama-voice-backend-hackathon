@@ -6,18 +6,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { DeviceService } from 'src/device/service/device.service';
-import { LoginRequestContext } from 'src/device/dto/device.dto';
-import { EmailService } from 'src/email/service/email.service';
+import { DeviceService } from '../../device/service/device.service';
+import { LoginRequestContext } from '../../device/dto/device.dto';
+import { EmailService } from '../../email/service/email.service';
 import {
   otpEmailHtml,
-} from 'src/email/templates/email.templates';
-import { LoginAuditService } from 'src/login-audit/service/login-audit.service';
-import { OtpService } from 'src/otp/service/otp.service';
-import { OTP_EXPIRY_MINUTES_VALUE } from 'src/otp/utils/otp.util';
-import { AccountStatusEnum } from 'src/user/enum/user.enum';
-import { UserEntity } from 'src/user/entity/user.entity';
-import { UserService } from 'src/user/service/user.service';
+} from '../../email/templates/email.templates';
+import { LoginAuditService } from '../../login-audit/service/login-audit.service';
+import { OtpService } from '../../otp/service/otp.service';
+import { OTP_EXPIRY_MINUTES_VALUE } from '../../otp/utils/otp.util';
+import { AccountStatusEnum } from '../../user/enum/user.enum';
+import { UserEntity } from '../../user/entity/user.entity';
+import { UserService } from '../../user/service/user.service';
 import {
   LoginBody,
   RefreshToken,

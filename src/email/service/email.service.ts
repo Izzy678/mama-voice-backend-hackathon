@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Resend } from 'resend';
-import { envEnum } from 'src/utils/enum/env.enum';
+import { envEnum } from '../../utils/enum/env.enum';
 import { SendEmailOptions } from '../interface/send-email.interface';
 
 @Injectable()

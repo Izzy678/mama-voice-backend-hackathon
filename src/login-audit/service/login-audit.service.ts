@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { EmailService } from 'src/email/service/email.service';
+import { EmailService } from '../../email/service/email.service';
 import {
   securityAlertEmailHtml,
-} from 'src/email/templates/email.templates';
-import { UserService } from 'src/user/service/user.service';
+} from '../../email/templates/email.templates';
+import { UserService } from '../../user/service/user.service';
 import { LoginAuditEntity } from '../entity/login-audit.entity';
 import { RiskLevelEnum } from '../enum/login-audit.enum';
 import {

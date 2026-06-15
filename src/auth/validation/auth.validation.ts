@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { DevicePlatformEnum } from 'src/device/enum/device.enum';
+import { DevicePlatformEnum } from '../../device/enum/device.enum';
 
 const passwordSchema = Joi.string()
   .min(8)

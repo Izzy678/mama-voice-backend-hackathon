@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import type { StringValue } from 'ms';
-import { envEnum } from 'src/utils/enum/env.enum';
+import { envEnum } from '../../utils/enum/env.enum';
 import { RefreshToken, Token } from '../dto/auth.dto';
 import { TokenStatusCodeEnum } from '../enum/auth.enum';
 

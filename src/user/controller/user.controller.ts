@@ -16,17 +16,17 @@ import {
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AuthResponseDto } from 'src/auth/dto/auth.swagger.dto';
-import { AuthService } from 'src/auth/service/auth.service';
-import type { Token } from 'src/auth/dto/auth.dto';
-import { TokenDataDecorator } from 'src/utils/decotator/token.decorator';
+import { AuthResponseDto } from '../../auth/dto/auth.swagger.dto';
+import { AuthService } from '../../auth/service/auth.service';
+import type { Token } from '../../auth/dto/auth.dto';
+import { TokenDataDecorator } from '../../utils/decotator/token.decorator';
 import {
     UpdateProfileRequestDto,
     UserProfileDto,
 } from '../dto/user.swagger.dto';
 import { UserService } from '../service/user.service';
-import { AuthGuard } from 'src/utils/guard/auth.guard';
-import { JoiObjectValidationPipe } from 'src/utils/pipes/validation.pipe';
+import { AuthGuard } from '../../utils/guard/auth.guard';
+import { JoiObjectValidationPipe } from '../../utils/pipes/validation.pipe';
 import { updateProfileValidator } from '../validation/user.validation';
 import type { UpdateProfileBody } from '../dto/user.dto';
 

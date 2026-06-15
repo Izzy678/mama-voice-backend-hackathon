@@ -10,7 +10,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JoiObjectValidationPipe } from 'src/utils/pipes/validation.pipe';
+import { JoiObjectValidationPipe } from '../../utils/pipes/validation.pipe';
 import type {
   LoginBody,
   RefreshTokenBody,
@@ -36,8 +36,8 @@ import {
   resendOtpValidator,
   verifyEmailOtpValidator,
 } from '../validation/auth.validation';
-import { getClientIp, getGeoFromRequest, getUserAgent } from 'src/utils/request/request.util';
-import { LoginRequestContext } from 'src/device/dto/device.dto';
+import { getClientIp, getGeoFromRequest, getUserAgent } from '../../utils/request/request.util';
+import { LoginRequestContext } from '../../device/dto/device.dto';
 
 @ApiTags('Auth')
 @Controller('auth')

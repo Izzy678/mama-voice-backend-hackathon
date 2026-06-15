@@ -2,8 +2,8 @@ import {
   AccountStatusEnum,
   LanguageEnum,
   MotherStageEnum,
-} from 'src/user/enum/user.enum';
-import { DevicePlatformEnum } from 'src/device/enum/device.enum';
+} from '../../user/enum/user.enum';
+import { DevicePlatformEnum } from '../../device/enum/device.enum';
 
 export interface Token {
   userId: string;

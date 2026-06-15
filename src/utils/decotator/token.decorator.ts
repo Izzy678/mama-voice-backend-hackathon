@@ -4,7 +4,7 @@ import {
   SetMetadata,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { Token } from 'src/auth/dto/auth.dto';
+import { Token } from '../../auth/dto/auth.dto';
 
 export const TokenDataDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
