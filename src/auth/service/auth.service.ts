@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 import { DeviceService } from '../../device/service/device.service';
 import { LoginRequestContext } from '../../device/dto/device.dto';
 import { EmailService } from '../../email/service/email.service';
@@ -29,6 +30,7 @@ import {
 } from '../dto/auth.dto';
 import { TokenStatusCodeEnum } from '../enum/auth.enum';
 import { TokenService } from './token.service';
+import { envEnum } from '../../utils/enum/env.enum';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +43,12 @@ export class AuthService {
     private readonly loginAuditService: LoginAuditService,
     private readonly emailService: EmailService,
     private readonly otpService: OtpService,
+    private readonly configService: ConfigService,
   ) { }
+
+  private get isDev(): boolean {
+    return this.configService.get<string>(envEnum.NODE_ENV) === 'development';
+  }
 
   async register(body: RegisterBody) {
     const existingUser = await this.userService.find({ email: body.email });
@@ -59,11 +66,12 @@ export class AuthService {
       profileCompleted: false,
     });
 
-    const otp = await this.issueAndSendOtp(user.id, user.email);
+    const { otp, code } = await this.issueAndSendOtp(user.id, user.email);
 
     return {
       email: user.email,
       otpId: otp.id,
+      ...(this.isDev && { devOtp: code }),
     };
   }
 
@@ -101,11 +109,12 @@ export class AuthService {
       throw new BadRequestException('Email is already verified');
     }
 
-    const otp = await this.issueAndSendOtp(user.id, user.email);
+    const { otp, code } = await this.issueAndSendOtp(user.id, user.email);
 
     return {
       email: user.email,
       otpId: otp.id,
+      ...(this.isDev && { devOtp: code }),
     };
   }
 
@@ -181,8 +190,7 @@ export class AuthService {
   }
 
   private async issueAndSendOtp(userId: string, email: string) {
-    const { otp, code } =
-      await this.otpService.createOtp(userId);
+    const { otp, code } = await this.otpService.createOtp(userId);
 
     try {
       await this.emailService.sendEmail({
@@ -192,10 +200,10 @@ export class AuthService {
       });
     } catch (error) {
       this.logger.error(`Failed to send OTP email to ${email}`, error);
-      throw error;
+      if (!this.isDev) throw error;
     }
 
-    return otp;
+    return { otp, code };
   }
 
    async buildAuthResponse(user: UserEntity) {
