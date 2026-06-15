@@ -19,14 +19,16 @@ import type {
   VerifyEmailOtpBody,
 } from '../dto/auth.dto';
 import {
-  AuthResponseDto,
   LoginRequestDto,
+  LoginResponseDto,
   OtpSentResponseDto,
   RefreshTokenRequestDto,
+  RefreshResponseDto,
   RegisterRequestDto,
   RegisterResponseDto,
   ResendOtpRequestDto,
   VerifyEmailOtpRequestDto,
+  VerifyEmailResponseDto,
 } from '../dto/auth.swagger.dto';
 import { AuthService } from '../service/auth.service';
 import {
@@ -56,9 +58,9 @@ export class AuthController {
   }
 
   @Post('verify-email')
-  @ApiOperation({ summary: 'Verify email with OTP' })
+  @ApiOperation({ summary: 'Verify email with OTP — returns token on success' })
   @ApiBody({ type: VerifyEmailOtpRequestDto })
-  @ApiOkResponse({ type: AuthResponseDto })
+  @ApiCreatedResponse({ type: VerifyEmailResponseDto })
   @ApiBadRequestResponse({ description: 'Invalid or expired OTP' })
   verifyEmailOtp(
     @Body(new JoiObjectValidationPipe(verifyEmailOtpValidator))
@@ -81,7 +83,7 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: 'Login with email and password' })
   @ApiBody({ type: LoginRequestDto })
-  @ApiOkResponse({ type: AuthResponseDto })
+  @ApiCreatedResponse({ type: LoginResponseDto })
   @ApiUnauthorizedResponse({ description: 'Invalid email or password' })
   login(
     @Body(new JoiObjectValidationPipe(loginValidator)) body: LoginBody,
@@ -93,7 +95,7 @@ export class AuthController {
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh access token using a refresh token' })
   @ApiBody({ type: RefreshTokenRequestDto })
-  @ApiOkResponse({ type: AuthResponseDto })
+  @ApiCreatedResponse({ type: RefreshResponseDto })
   @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token' })
   refresh(
     @Body(new JoiObjectValidationPipe(refreshValidator)) body: RefreshTokenBody,

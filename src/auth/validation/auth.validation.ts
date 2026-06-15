@@ -32,10 +32,10 @@ export const registerValidator = Joi.object({
 export const loginValidator = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required(),
-  deviceId: Joi.string().required(),
+  deviceId: Joi.string().optional(),
   platform: Joi.string()
     .valid(DevicePlatformEnum.Ios, DevicePlatformEnum.Android)
-    .required(),
+    .optional(),
   deviceModel: Joi.string().optional(),
   pushNotificationToken: Joi.string().optional(),
 });

@@ -31,8 +31,8 @@ export interface RegisterBody {
 export interface LoginBody {
   email: string;
   password: string;
-  deviceId: string;
-  platform: DevicePlatformEnum;
+  deviceId?: string;
+  platform?: DevicePlatformEnum;
   deviceModel?: string | null;
   pushNotificationToken?: string | null;
 }

@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import { setupSwagger } from './utils/swagger/swagger.config';
+import { ResponseInterceptor } from './utils/interceptor/response.interceptor';
+import { GlobalExceptionFilter } from './utils/filter/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -23,6 +25,8 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix('api');
+  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalFilters(new GlobalExceptionFilter());
   setupSwagger(app);
 
   const port = process.env.PORT ?? 3000;

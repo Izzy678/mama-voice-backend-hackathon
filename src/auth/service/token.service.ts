@@ -48,7 +48,7 @@ export class TokenService {
 
   generatePasswordResetToken(user: string): string {
     const token = this.jwtService.sign(
-      { user },
+      { userId: user },
       {
         secret: this.tokenSecret,
         expiresIn: '15m',
