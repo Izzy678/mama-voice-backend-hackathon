@@ -5,6 +5,29 @@ import {
   MotherStageEnum,
 } from '../enum/user.enum';
 
+export class SetProfileRequestDto {
+  @ApiProperty({ example: 'Amina', description: 'First name (2–50 characters)' })
+  firstName: string;
+
+  @ApiProperty({
+    example: 'PREGNANT',
+    enum: ['PREGNANT', 'NEW_MOM'],
+    description: 'PREGNANT = due date expected, NEW_MOM = baby already born',
+  })
+  type: 'PREGNANT' | 'NEW_MOM';
+
+  @ApiProperty({
+    example: '2025-09-15',
+    description: 'ISO date. Due date if PREGNANT; baby\'s date of birth if NEW_MOM',
+  })
+  targetDate: string;
+}
+
+export class SetProfileResponseDto {
+  @ApiProperty({ example: 'SUCCESS' })
+  status: string;
+}
+
 export class UpdateProfileRequestDto {
   @ApiProperty({
     example: 'Amaka',

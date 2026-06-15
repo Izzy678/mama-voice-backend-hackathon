@@ -2,7 +2,7 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import {
     ApiBearerAuth,
     ApiBody,
-    ApiOkResponse,
+    ApiCreatedResponse,
     ApiOperation,
     ApiTags,
     ApiUnauthorizedResponse,
@@ -15,6 +15,7 @@ import { UserService } from '../service/user.service';
 import { MotherStageEnum } from '../enum/user.enum';
 import type { SetProfileBody } from '../dto/user.dto';
 import { setProfileValidator } from '../validation/user.validation';
+import { SetProfileRequestDto, SetProfileResponseDto } from '../dto/user.swagger.dto';
 
 @ApiTags('User')
 @ApiBearerAuth('access-token')
@@ -25,18 +26,8 @@ export class UserOnboardingController {
     @Post('profile')
     @UseGuards(AuthGuard)
     @ApiOperation({ summary: 'Set user profile after registration' })
-    @ApiBody({
-        schema: {
-            type: 'object',
-            properties: {
-                firstName: { type: 'string' },
-                type: { type: 'string', enum: ['PREGNANT', 'NEW_MOM'] },
-                targetDate: { type: 'string', format: 'date', example: '2025-09-01' },
-            },
-            required: ['firstName', 'type', 'targetDate'],
-        },
-    })
-    @ApiOkResponse({ schema: { type: 'object', properties: { status: { type: 'string', example: 'SUCCESS' } } } })
+    @ApiBody({ type: SetProfileRequestDto })
+    @ApiCreatedResponse({ type: SetProfileResponseDto })
     @ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
     async setProfile(
         @Body(new JoiObjectValidationPipe(setProfileValidator)) body: SetProfileBody,
