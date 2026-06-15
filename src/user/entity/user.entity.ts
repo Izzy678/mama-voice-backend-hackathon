@@ -49,6 +49,9 @@ export class UserEntity {
   @Column({ type: 'boolean', default: false })
   emailVerified: boolean;
 
+  @Column({ type: 'date', nullable: true })
+  targetDate: Date | null;
+
   @Column({ type: 'boolean', default: false })
   profileCompleted: boolean;
 
