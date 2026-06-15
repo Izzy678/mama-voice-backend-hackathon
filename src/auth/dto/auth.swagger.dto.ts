@@ -3,6 +3,8 @@ import { DevicePlatformEnum } from '../../device/enum/device.enum';
 import { OtpPurposeEnum } from '../../otp/enum/otp.enum';
 import { UserProfileDto } from '../../user/dto/user.swagger.dto';
 
+export class AuthUserDto extends UserProfileDto {}
+
 // ─── Request DTOs ────────────────────────────────────────────────────────────
 
 export class RegisterRequestDto {
@@ -93,6 +95,9 @@ export class VerifyEmailResponseDto {
 
   @ApiProperty({ example: false, description: 'Always false for a newly verified account' })
   isExistingUser: boolean;
+
+  @ApiPropertyOptional({ type: () => AuthUserDto, description: 'Authenticated user profile' })
+  user?: AuthUserDto;
 }
 
 export class LoginResponseDto {
@@ -104,6 +109,15 @@ export class LoginResponseDto {
 
   @ApiProperty({ example: true, description: 'Always true for login — use to skip onboarding' })
   isExistingUser: boolean;
+
+  @ApiProperty({
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    description: 'Use this to get a new access token via /auth/refresh',
+  })
+  refreshToken: string;
+
+  @ApiPropertyOptional({ type: () => AuthUserDto, description: 'Authenticated user profile' })
+  user?: AuthUserDto;
 }
 
 export class RefreshResponseDto {
@@ -136,7 +150,6 @@ export class OtpPublicDto {
   createdAt: Date;
 }
 
-export class AuthUserDto extends UserProfileDto {}
 
 export class AuthResponseDto {
   @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })

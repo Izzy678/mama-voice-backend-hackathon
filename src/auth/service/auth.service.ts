@@ -95,8 +95,8 @@ export class AuthService {
       emailVerified: true,
     });
 
-    const { accessToken, refreshToken } = await this.buildAuthResponse(verifiedUser!);
-    return { token: accessToken, refreshToken, isExistingUser: false };
+    const { accessToken, refreshToken, user: profile } = await this.buildAuthResponse(verifiedUser!);
+    return { token: accessToken, refreshToken, user: profile, isExistingUser: false };
   }
 
   async resendOtp(body: ResendOtpBody) {
@@ -161,8 +161,8 @@ export class AuthService {
       lastLoginAt: loggedInAt,
     });
 
-    const { accessToken } = await this.buildAuthResponse(user);
-    return { token: accessToken, isExistingUser: true };
+    const { accessToken, refreshToken, user: profile } = await this.buildAuthResponse(user);
+    return { token: accessToken, refreshToken, user: profile, isExistingUser: true };
   }
 
 

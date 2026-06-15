@@ -1,7 +1,7 @@
 import {
-  BadRequestException,
   Injectable,
   NestMiddleware,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { TokenService } from '../../auth/service/token.service';
@@ -23,7 +23,7 @@ export class UserTokenMiddleware implements NestMiddleware {
     const [bearer, token] = authorizationHeader.split(' ');
 
     if (bearer !== 'Bearer' || !token) {
-      throw new BadRequestException('please provide a valid JWT token');
+      throw new UnauthorizedException('Please provide a valid JWT token');
     }
 
     const tokenData = await this.tokenService.verifyAuthorizationToken(token);
@@ -32,12 +32,12 @@ export class UserTokenMiddleware implements NestMiddleware {
       tokenData.code !== TokenStatusCodeEnum.VALID ||
       !tokenData.token
     ) {
-      throw new BadRequestException('please provide a valid JWT token');
+      throw new UnauthorizedException('Invalid or expired access token');
     }
 
     if (tokenData.token.accountStatus === AccountStatusEnum.Suspended)
-      throw new BadRequestException(
-        'sorry your account is suspended. Kindly contact admin for further assistance',
+      throw new UnauthorizedException(
+        'Your account is suspended. Please contact support for assistance',
       );
 
     res.locals.tokenData = tokenData;
