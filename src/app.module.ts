@@ -13,6 +13,7 @@ import { UserTokenMiddleware } from './utils/middleware/token.middleware';
 import { envEnum } from './utils/enum/env.enum';
 import { LoginAuditModule } from './login-audit/login-audit.module';
 import { OtpModule } from './otp/otp.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { OtpModule } from './otp/otp.module';
     UserModule,
     LoginAuditModule,
     OtpModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService, UserTokenMiddleware],
