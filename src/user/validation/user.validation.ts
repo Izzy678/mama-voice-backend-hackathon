@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import { LanguageEnum, MotherStageEnum } from '../enum/user.enum';
+import { ALL_LGAS, NIGERIA_STATE_LGAS, NIGERIAN_STATES } from '../constants/nigeria.constants';
 
 const nameSchema = Joi.string()
   .trim()
@@ -27,8 +28,18 @@ export const updateProfileValidator = Joi.object({
       ...Object.values(LanguageEnum),
     )
     .required(),
-  state: Joi.string().trim().min(2).max(100).required(),
-  lga: Joi.string().trim().min(2).max(100).required(),
+  state: Joi.string().valid(...NIGERIAN_STATES).required(),
+  lga: Joi.string()
+    .valid(...ALL_LGAS)
+    .custom((value, helpers) => {
+      const state: string | undefined = (helpers.state.ancestors[0] as Record<string, unknown>)?.state as string | undefined;
+      if (state && NIGERIA_STATE_LGAS[state] && !NIGERIA_STATE_LGAS[state].includes(value)) {
+        return helpers.error('any.invalid');
+      }
+      return value;
+    })
+    .required()
+    .messages({ 'any.invalid': 'LGA does not belong to the selected state' }),
   motherStage: Joi.string()
     .valid(MotherStageEnum.Pregnant, MotherStageEnum.Postpartum)
     .required(),
