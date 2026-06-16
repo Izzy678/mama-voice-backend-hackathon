@@ -6,29 +6,6 @@ import {
 } from '../enum/user.enum';
 import { ALL_LGAS, NIGERIAN_STATES } from '../constants/nigeria.constants';
 
-export class SetProfileRequestDto {
-  @ApiProperty({ example: 'Amina', description: 'First name (2–50 characters)' })
-  firstName: string;
-
-  @ApiProperty({
-    example: 'PREGNANT',
-    enum: ['PREGNANT', 'NEW_MOM'],
-    description: 'PREGNANT = due date expected, NEW_MOM = baby already born',
-  })
-  type: 'PREGNANT' | 'NEW_MOM';
-
-  @ApiProperty({
-    example: '2025-09-15',
-    description: 'ISO date. Due date if PREGNANT; baby\'s date of birth if NEW_MOM',
-  })
-  targetDate: string;
-}
-
-export class SetProfileResponseDto {
-  @ApiProperty({ example: 'SUCCESS' })
-  status: string;
-}
-
 export class UpdateProfileRequestDto {
   @ApiProperty({
     example: 'Amaka',
@@ -45,13 +22,6 @@ export class UpdateProfileRequestDto {
     maxLength: 50,
   })
   lastName: string;
-
-  @ApiProperty({
-    example: '08012345678',
-    description:
-      'Nigerian mobile number. Accepts local (080…) or international (+234…) format. Stored as +234XXXXXXXXXX.',
-  })
-  phoneNumber: string;
 
   @ApiProperty({
     enum: LanguageEnum,
@@ -81,6 +51,12 @@ export class UpdateProfileRequestDto {
       'Whether the user is currently pregnant or postpartum. Determines the next onboarding step (pregnancy record vs baby profile).',
   })
   motherStage: MotherStageEnum;
+
+  @ApiProperty({
+    example: '2025-09-15',
+    description: 'ISO date. Due date if pregnant; baby\'s date of birth if postpartum',
+  })
+  targetDate: string;
 }
 
 export class UserProfileDto {
@@ -96,9 +72,6 @@ export class UserProfileDto {
   @ApiProperty({ example: 'Okafor', nullable: true })
   lastName: string | null;
 
-  @ApiProperty({ example: '+2348012345678', nullable: true })
-  phoneNumber: string | null;
-
   @ApiProperty({ enum: LanguageEnum, example: LanguageEnum.Igbo, nullable: true })
   language: LanguageEnum | null;
 
@@ -110,6 +83,13 @@ export class UserProfileDto {
 
   @ApiProperty({ enum: MotherStageEnum, example: MotherStageEnum.Pregnant, nullable: true })
   motherStage: MotherStageEnum | null;
+
+  @ApiProperty({
+    example: '2025-09-15',
+    nullable: true,
+    description: 'Due date if pregnant; baby\'s date of birth if postpartum',
+  })
+  targetDate: Date | null;
 
   @ApiProperty({ enum: AccountStatusEnum, example: AccountStatusEnum.Active })
   accountStatus: AccountStatusEnum;
