@@ -213,7 +213,6 @@ export class AuthService {
       email: user?.email,
       firstName: user?.firstName,
       lastName: user?.lastName,
-      phoneNumber: user?.phoneNumber,
       language: user?.language,
       state: user?.state,
       lga: user?.lga,

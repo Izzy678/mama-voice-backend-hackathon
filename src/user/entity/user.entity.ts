@@ -37,9 +37,6 @@ export class UserEntity {
   @Column({ type: 'varchar', nullable: true })
   lastName: string | null;
 
-  @Column({ type: 'varchar', unique: true, nullable: true })
-  phoneNumber: string | null;
-
   @Column({ type: 'varchar', nullable: true })
   state: string | null;
 

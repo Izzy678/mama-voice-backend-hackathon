@@ -14,6 +14,8 @@ import { envEnum } from './utils/enum/env.enum';
 import { LoginAuditModule } from './login-audit/login-audit.module';
 import { OtpModule } from './otp/otp.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { FoodModule } from './foods/food.module';
+import { GenericApiModule } from './generic-api/generic-api.module';
 
 @Module({
   imports: [
@@ -44,6 +46,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
     LoginAuditModule,
     OtpModule,
     DashboardModule,
+    FoodModule,
+    GenericApiModule,
   ],
   controllers: [AppController],
   providers: [AppService, UserTokenMiddleware],

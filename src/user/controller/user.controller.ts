@@ -16,8 +16,6 @@ import {
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AuthResponseDto } from '../../auth/dto/auth.swagger.dto';
-import { AuthService } from '../../auth/service/auth.service';
 import type { Token } from '../../auth/dto/auth.dto';
 import { TokenDataDecorator } from '../../utils/decotator/token.decorator';
 import {
@@ -34,10 +32,7 @@ import type { UpdateProfileBody } from '../dto/user.dto';
 @ApiBearerAuth('access-token')
 @Controller('users')
 export class UserController {
-    constructor(
-        private readonly userService: UserService,
-        private readonly authService: AuthService,
-    ) { }
+    constructor(private readonly userService: UserService) { }
 
     @Get('me')
     @UseGuards(AuthGuard)
@@ -49,11 +44,11 @@ export class UserController {
         return this.userService.getUserProfile(token.userId);
     }
 
-    @Patch('me')
+    @Patch('profile')
     @UseGuards(AuthGuard)
     @ApiOperation({ summary: 'Complete user profile onboarding' })
     @ApiBody({ type: UpdateProfileRequestDto })
-    @ApiOkResponse({ type: AuthResponseDto })
+    @ApiOkResponse({ type: UserProfileDto })
     @ApiBadRequestResponse({ description: 'Invalid request body' })
     @ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
     @ApiNotFoundResponse({ description: 'User not found' })
@@ -61,14 +56,18 @@ export class UserController {
         @Body(new JoiObjectValidationPipe(updateProfileValidator)) body: UpdateProfileBody,
         @TokenDataDecorator() token: Token,
     ) {
+        const { targetDate, ...profile } = body;
         const updatedUser = await this.userService.update({
             id: token.userId,
-            ...body,
+            ...profile,
+            targetDate: new Date(targetDate),
             profileCompleted: true,
         });
         if (!updatedUser) {
             throw new NotFoundException('User not found');
         }
-        return this.authService.buildAuthResponse(updatedUser);
+
+        const { password, refreshToken, ...user } = updatedUser;
+        return user;
     }
 }

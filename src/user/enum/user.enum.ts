@@ -1,3 +1,8 @@
+export enum ProfileTypesEnum {
+  Pregnant = 'Pregnant',
+  NewMom = 'New Mom',
+}
+
 export enum AccountStatusEnum {
   Active = 'active',
   Suspended = 'suspended',
@@ -6,7 +11,7 @@ export enum AccountStatusEnum {
 
 export enum MotherStageEnum {
   Pregnant = 'Pregnant',
-  Postpartum = 'Postpartum',
+  NewMom = 'New Mom',
 }
 
 export enum LanguageEnum {

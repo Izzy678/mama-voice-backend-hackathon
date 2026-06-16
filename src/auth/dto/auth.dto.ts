@@ -11,7 +11,6 @@ export interface Token {
   email: string;
   firstName: string | null;
   lastName: string | null;
-  phoneNumber: string | null;
   language: LanguageEnum | null;
   state: string | null;
   lga: string | null;
