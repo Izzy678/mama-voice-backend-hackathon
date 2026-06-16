@@ -80,7 +80,7 @@ export const NIGERIA_STATE_LGAS: Record<string, string[]> = {
   ],
   Gombe: [
     'Akko', 'Balanga', 'Billiri', 'Dukku', 'Funakaye', 'Gombe', 'Kaltungo',
-    'Kwami', 'Nafada', 'Shomgom', 'Yamaltu/Deba',
+    'Kwami', 'Nafada', 'Shongom', 'Yamaltu/Deba',
   ],
   Imo: [
     'Aboh Mbaise', 'Ahiazu Mbaise', 'Ehime Mbano', 'Ezinihitte', 'Ideato North',
