@@ -4,6 +4,7 @@ import {
   LanguageEnum,
   MotherStageEnum,
 } from '../enum/user.enum';
+import { ALL_LGAS, NIGERIAN_STATES } from '../constants/nigeria.constants';
 
 export class SetProfileRequestDto {
   @ApiProperty({ example: 'Amina', description: 'First name (2–50 characters)' })
@@ -60,18 +61,16 @@ export class UpdateProfileRequestDto {
   language: LanguageEnum;
 
   @ApiProperty({
+    enum: NIGERIAN_STATES,
     example: 'Enugu',
     description: 'Nigerian state of residence',
-    minLength: 2,
-    maxLength: 100,
   })
   state: string;
 
   @ApiProperty({
+    enum: ALL_LGAS,
     example: 'Enugu North',
-    description: 'Local Government Area (LGA)',
-    minLength: 2,
-    maxLength: 100,
+    description: 'Local Government Area — must belong to the selected state',
   })
   lga: string;
 
