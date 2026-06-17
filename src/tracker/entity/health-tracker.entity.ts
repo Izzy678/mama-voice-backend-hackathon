@@ -12,7 +12,6 @@ import { UserEntity } from '../../user/entity/user.entity';
 
 @Entity('health_tracker')
 @Index('idx_health_tracker_user_id', ['userId'])
-@Index('idx_health_tracker_user_date', ['userId', 'logDate'], { unique: true })
 export class HealthTrackerEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;

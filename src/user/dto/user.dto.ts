@@ -34,3 +34,9 @@ export interface ProfileCompletionFields {
   lga: string | null;
   motherStage: MotherStageEnum | null;
 }
+
+export interface SetProfileBody {
+  firstName: string;
+  type: 'PREGNANT' | 'NEW_MOM';
+  targetDate: string;
+}

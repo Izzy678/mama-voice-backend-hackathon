@@ -108,7 +108,8 @@ export class VaccineService {
       });
     }
 
-    tracker.isCompleted = true;
+    tracker.vaccineName = body.vaccineName ?? scheduleEntry.vaccineName;
+    tracker.isCompleted = body.isCompleted ?? true;
     tracker.administeredDate = new Date(body.administeredDate);
     tracker.sideEffects = body.sideEffects ?? null;
 

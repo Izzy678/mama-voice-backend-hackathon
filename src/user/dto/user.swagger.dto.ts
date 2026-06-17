@@ -6,6 +6,29 @@ import {
 } from '../enum/user.enum';
 import { ALL_LGAS, NIGERIAN_STATES } from '../constants/nigeria.constants';
 
+export class SetProfileRequestDto {
+  @ApiProperty({ example: 'Amaka', description: 'First name of the user' })
+  firstName: string;
+
+  @ApiProperty({
+    enum: ['PREGNANT', 'NEW_MOM'],
+    example: 'PREGNANT',
+    description: 'PREGNANT if currently expecting; NEW_MOM if baby is already born',
+  })
+  type: string;
+
+  @ApiProperty({
+    example: '2025-09-15',
+    description: 'ISO date. Expected due date if PREGNANT; baby\'s date of birth if NEW_MOM',
+  })
+  targetDate: string;
+}
+
+export class SetProfileResponseDto {
+  @ApiProperty({ example: 'SUCCESS' })
+  status: string;
+}
+
 export class UpdateProfileRequestDto {
   @ApiProperty({
     example: 'Amaka',

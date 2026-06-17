@@ -13,6 +13,12 @@ const nameSchema = Joi.string()
     'string.pattern.base': 'Name contains invalid characters',
   });
 
+export const setProfileValidator = Joi.object({
+  firstName: Joi.string().trim().min(2).max(50).required(),
+  type: Joi.string().valid('PREGNANT', 'NEW_MOM').required(),
+  targetDate: Joi.string().isoDate().required(),
+});
+
 export const updateProfileValidator = Joi.object({
   firstName: nameSchema.required(),
   lastName: nameSchema.required(),
