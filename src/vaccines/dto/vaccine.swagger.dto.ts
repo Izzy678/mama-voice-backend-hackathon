@@ -35,6 +35,12 @@ export class LogVaccineRequestDto {
   @ApiProperty({ example: '2024-03-01', description: 'ISO date string of when the vaccine was administered' })
   administeredDate: string;
 
+  @ApiProperty({ example: 'Penta 1, OPV 1, PCV 1 & Rotavirus 1', required: false, nullable: true, description: 'Optional display name — falls back to the schedule name if omitted' })
+  vaccineName?: string;
+
+  @ApiProperty({ example: true, required: false, description: 'Whether the vaccine was completed. Defaults to true if omitted' })
+  isCompleted?: boolean;
+
   @ApiProperty({ example: 'mild fever for 24 hours', required: false, nullable: true })
   sideEffects?: string;
 }
