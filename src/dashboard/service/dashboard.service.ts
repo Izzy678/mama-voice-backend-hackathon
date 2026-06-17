@@ -1,22 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { UserService } from '../../user/service/user.service';
 import { MotherStageEnum } from '../../user/enum/user.enum';
-
-interface VaccineEntry {
-    weekAge: number;
-    name: string;
-}
-
-const VACCINATION_SCHEDULE: VaccineEntry[] = [
-    { weekAge: 0, name: 'BCG, OPV 0 & Hepatitis B' },
-    { weekAge: 6, name: 'Penta 1, OPV 1, PCV 1 & Rotavirus 1' },
-    { weekAge: 10, name: 'Penta 2, OPV 2, PCV 2 & Rotavirus 2' },
-    { weekAge: 14, name: 'Penta 3, OPV 3 & PCV 3' },
-    { weekAge: 26, name: 'Vitamin A (1st dose)' },
-    { weekAge: 36, name: 'Measles-Rubella 1 & Yellow Fever' },
-    { weekAge: 52, name: 'Vitamin A (2nd dose)' },
-    { weekAge: 60, name: 'Measles-Rubella 2' },
-];
+import { NIGERIA_VACCINE_SCHEDULE } from '../../vaccines/constants/vaccine-schedule';
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
@@ -71,7 +56,7 @@ export class DashboardService {
         const babyAgeDays = Math.round((today.getTime() - birthDate.getTime()) / MS_PER_DAY);
         const babyAgeWeeks = Math.floor(babyAgeDays / 7);
 
-        const nextVaccine = VACCINATION_SCHEDULE.find((v) => v.weekAge > babyAgeWeeks);
+        const nextVaccine = NIGERIA_VACCINE_SCHEDULE.find((v) => v.weekAge > babyAgeWeeks);
 
         let daysToNextVaccine: number | null = null;
         let nextVaccineName: string | null = null;
@@ -80,7 +65,7 @@ export class DashboardService {
             const nextDue = new Date(birthDate);
             nextDue.setDate(nextDue.getDate() + nextVaccine.weekAge * 7);
             daysToNextVaccine = Math.max(0, Math.round((nextDue.getTime() - today.getTime()) / MS_PER_DAY));
-            nextVaccineName = nextVaccine.name;
+            nextVaccineName = nextVaccine.vaccineName;
         }
 
         return {
