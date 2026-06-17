@@ -34,7 +34,7 @@ export class UserOnboardingController {
         @TokenDataDecorator() token: Token,
     ) {
         const motherStage =
-            body.type === 'PREGNANT' ? MotherStageEnum.Pregnant : MotherStageEnum.Postpartum;
+            body.type === 'PREGNANT' ? MotherStageEnum.Pregnant : MotherStageEnum.NewMom;
 
         await this.userService.update({
             id: token.userId,
