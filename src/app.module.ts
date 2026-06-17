@@ -16,6 +16,7 @@ import { OtpModule } from './otp/otp.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { FoodModule } from './foods/food.module';
 import { GenericApiModule } from './generic-api/generic-api.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { GenericApiModule } from './generic-api/generic-api.module';
     DashboardModule,
     FoodModule,
     GenericApiModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService, UserTokenMiddleware],

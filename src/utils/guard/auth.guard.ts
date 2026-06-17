@@ -17,11 +17,6 @@ export class AuthGuard implements CanActivate {
                 'You are not authorized to access this resource',
             );
         }
-        if (!tokenData) {
-            throw new UnauthorizedException(
-                'you are not authroized to access this resource',
-            );
-        }
         return true;
     }
 }
