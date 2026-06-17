@@ -17,6 +17,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { FoodModule } from './foods/food.module';
 import { GenericApiModule } from './generic-api/generic-api.module';
 import { AiModule } from './ai/ai.module';
+import { VaccineModule } from './vaccines/vaccine.module';
+import { TrackerModule } from './tracker/tracker.module';
 
 @Module({
   imports: [
@@ -50,6 +52,8 @@ import { AiModule } from './ai/ai.module';
     FoodModule,
     GenericApiModule,
     AiModule,
+    VaccineModule,
+    TrackerModule,
   ],
   controllers: [AppController],
   providers: [AppService, UserTokenMiddleware],
