@@ -31,24 +31,15 @@ export class TrackerService {
   }
 
   async logHealth(userId: string, body: LogHealthBody) {
-    const logDate = new Date(body.logDate);
-
-    await this.healthTrackerRepository.upsert(
-      {
-        userId,
-        logDate,
-        weightKg: body.weightKg ?? null,
-        bloodPressure: body.bloodPressure ?? null,
-        nutritionNotes: body.nutritionNotes ?? null,
-        symptoms: body.symptoms ?? null,
-      },
-      { conflictPaths: ['userId', 'logDate'], skipUpdateIfNoValuesChanged: false },
-    );
-
-    const saved = await this.healthTrackerRepository.findOne({
-      where: { userId, logDate },
+    const log = this.healthTrackerRepository.create({
+      userId,
+      logDate: new Date(body.logDate),
+      weightKg: body.weightKg ?? null,
+      bloodPressure: body.bloodPressure ?? null,
+      nutritionNotes: body.nutritionNotes ?? null,
+      symptoms: body.symptoms ?? null,
     });
 
-    return saved;
+    return this.healthTrackerRepository.save(log);
   }
 }
