@@ -19,6 +19,8 @@ import { GenericApiModule } from './generic-api/generic-api.module';
 import { AiModule } from './ai/ai.module';
 import { VaccineModule } from './vaccines/vaccine.module';
 import { TrackerModule } from './tracker/tracker.module';
+import { VoiceModule } from './voice/voice.module';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -54,6 +56,8 @@ import { TrackerModule } from './tracker/tracker.module';
     AiModule,
     VaccineModule,
     TrackerModule,
+    FileModule,
+    VoiceModule,
   ],
   controllers: [AppController],
   providers: [AppService, UserTokenMiddleware],

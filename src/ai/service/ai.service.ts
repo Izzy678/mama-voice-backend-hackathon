@@ -1,93 +1,66 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { AiIntent } from '../enum/ai.enum';
-import { buildLlamaPrompt } from '../constants/ai-prompts';
-import {
-  MEDICAL_DISCLAIMER,
-  UNAVAILABLE_FALLBACK,
-} from '../constants/ai-fallbacks';
-import { cleanAiResponseText } from '../constants/clean-ai-response';
 import { AiContextService } from './ai-context.service';
-import { AiRouterService } from './ai-router.service';
-import { AiSafetyService } from './ai-safety.service';
-import { HfInferenceClient } from './hf-inference.client';
 import { GeminiClient } from './gemini.client';
 import { ClaudeClient } from './claude.client';
-import type { AiQueryResponse } from '../dto/ai.dto';
-import { MotherStageEnum } from '../../user/enum/user.enum';
+import type { AiQueryResponse, AiVoiceQueryResponse } from '../dto/ai.dto';
+import { AiRiskLevel } from '../enum/ai.enum';
+import { LanguageEnum } from '../../user/enum/user.enum';
+
+const UNAVAILABLE_FALLBACK =
+  'I am unable to answer right now. For urgent concerns, please contact your health worker or visit the nearest facility.';
+
 
 @Injectable()
 export class AiService {
   private readonly logger = new Logger(AiService.name);
 
   constructor(
-    private readonly aiSafetyService: AiSafetyService,
     private readonly aiContextService: AiContextService,
-    private readonly aiRouterService: AiRouterService,
-    private readonly hfInferenceClient: HfInferenceClient,
     private readonly geminiClient: GeminiClient,
     private readonly claudeClient: ClaudeClient,
-  ) {}
+  ) { }
 
   async query(userId: string, textQuery: string): Promise<AiQueryResponse> {
-    if (this.aiSafetyService.hasEmergencyKeywords(textQuery)) {
-      return {
-        aiResponseText: this.appendDisclaimer(
-          this.aiSafetyService.getEmergencyResponse(),
-        ),
-        isDangerSign: true,
-      };
-    }
-
     const context = await this.aiContextService.buildContext(userId);
-    const motherStage = context.motherStage as MotherStageEnum;
-    const intent = this.aiRouterService.classifyIntent(textQuery, motherStage);
 
-    let rawResponse = await this.geminiClient.generate(
+    let rawResponse = await this.geminiClient.generateForText(
       context,
       textQuery,
-      intent,
     );
 
     if (!rawResponse?.trim()) {
       this.logger.warn('Gemini failed; trying Claude fallback');
-      rawResponse = await this.claudeClient.generate(
-        context,
-        textQuery,
-        intent,
-      );
+      rawResponse = await this.claudeClient.generate(context, textQuery);
     }
-
-    if (!rawResponse?.trim()) {
-      const modelId =
-        intent === AiIntent.VAXLLAMA
-          ? this.hfInferenceClient.getVaxllamaModelId()
-          : this.hfInferenceClient.getMamabotModelId();
-      const prompt = buildLlamaPrompt(context, textQuery);
-
-      this.logger.warn(
-        `Claude fallback failed; trying Hugging Face (${modelId})`,
-      );
-      rawResponse = await this.hfInferenceClient.generate(modelId, prompt);
-    }
-
-    const responseText = cleanAiResponseText(
-      rawResponse?.trim() || UNAVAILABLE_FALLBACK,
-    );
-
-    const isDangerSign =
-      this.aiSafetyService.hasEmergencyKeywords(responseText);
 
     return {
-      aiResponseText: responseText,
-      isDangerSign,
+      aiResponseText: rawResponse?.trim() || UNAVAILABLE_FALLBACK,
+      isDangerSign: false,
     };
   }
 
-  private appendDisclaimer(text: string): string {
-    const trimmed = text.trim();
-    if (trimmed.includes(MEDICAL_DISCLAIMER)) {
-      return trimmed;
-    }
-    return `${trimmed} ${MEDICAL_DISCLAIMER}`;
+  async queryForVoice(
+    userId: string,
+    textQuery: string,
+    language: LanguageEnum,
+  ): Promise<AiVoiceQueryResponse> {
+    const context = await this.aiContextService.buildContext(userId);
+
+    const rawResponse = await this.geminiClient.generateForVoice(
+      context,
+      textQuery,
+      language,
+    );
+    const parsed = JSON.parse(rawResponse || '{}') as AiVoiceQueryResponse;
+
+    return {
+      spokenResponse: parsed?.spokenResponse || UNAVAILABLE_FALLBACK,
+      spokenResponseEnglish: parsed?.spokenResponseEnglish || UNAVAILABLE_FALLBACK,
+      riskLevel: parsed?.riskLevel || AiRiskLevel.LOW,
+      aiResponseText: parsed.aiResponseText || UNAVAILABLE_FALLBACK,
+      isDangerSign: false,
+    };
   }
+
+
 }

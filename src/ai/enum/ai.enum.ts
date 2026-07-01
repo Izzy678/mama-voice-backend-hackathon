@@ -1,4 +1,6 @@
-export enum AiIntent {
-  MAMABOT = 'MAMABOT',
-  VAXLLAMA = 'VAXLLAMA',
+export enum AiRiskLevel {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  EMERGENCY = 'EMERGENCY',
 }

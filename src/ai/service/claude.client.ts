@@ -3,11 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { envEnum } from '../../utils/enum/env.enum';
 import type { AiPromptContext } from '../constants/ai-prompts';
 import { buildAssistantSystemPrompt } from '../constants/ai-prompts';
-import { AiIntent } from '../enum/ai.enum';
 
 const DEFAULT_CLAUDE_MODEL = 'claude-3-5-haiku-20241022';
 const DEFAULT_TEMPERATURE = 0.2;
-const DEFAULT_MAX_OUTPUT_TOKENS = 256;
 const REQUEST_TIMEOUT_MS = 30_000;
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
@@ -28,7 +26,6 @@ export class ClaudeClient {
   async generate(
     context: AiPromptContext,
     textQuery: string,
-    intent: AiIntent,
   ): Promise<string | null> {
     const apiKey = this.configService.get<string>(envEnum.ANTHROPIC_API_KEY);
     if (!apiKey) {
@@ -38,18 +35,8 @@ export class ClaudeClient {
       return null;
     }
 
-    const model =
-      this.configService.get<string>(envEnum.CLAUDE_MODEL) ??
-      DEFAULT_CLAUDE_MODEL;
-    const temperature = this.parseNumber(
-      this.configService.get<string>(envEnum.AI_TEMPERATURE),
-      DEFAULT_TEMPERATURE,
-    );
-    const maxTokens = this.parseNumber(
-      this.configService.get<string>(envEnum.AI_MAX_NEW_TOKENS),
-      DEFAULT_MAX_OUTPUT_TOKENS,
-    );
-    const system = buildAssistantSystemPrompt(context, intent);
+
+    const system = buildAssistantSystemPrompt(context);
 
     try {
       const response = await this.fetchWithTimeout(CLAUDE_API_URL, {
@@ -60,9 +47,9 @@ export class ClaudeClient {
           'anthropic-version': ANTHROPIC_VERSION,
         },
         body: JSON.stringify({
-          model,
-          max_tokens: maxTokens,
-          temperature,
+          model: DEFAULT_CLAUDE_MODEL,
+          //max_tokens: DEFAULT_MAX_OUTPUT_TOKENS,
+          temperature: DEFAULT_TEMPERATURE,
           system,
           messages: [{ role: 'user', content: textQuery }],
         }),
@@ -103,9 +90,4 @@ export class ClaudeClient {
     }
   }
 
-  private parseNumber(value: string | undefined, fallback: number): number {
-    if (!value) return fallback;
-    const parsed = Number(value);
-    return Number.isNaN(parsed) ? fallback : parsed;
-  }
 }
