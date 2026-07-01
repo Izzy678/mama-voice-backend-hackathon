@@ -3,11 +3,12 @@ import { ConfigService } from '@nestjs/config';
 import { envEnum } from '../../utils/enum/env.enum';
 import type { AiPromptContext } from '../constants/ai-prompts';
 import { buildAssistantSystemPrompt } from '../constants/ai-prompts';
-import { AiIntent } from '../enum/ai.enum';
+import { LanguageEnum } from '../../user/enum/user.enum';
+import { PromptBuilderService } from './prompt-builder.service';
 
 const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 const DEFAULT_TEMPERATURE = 0.2;
-const DEFAULT_MAX_OUTPUT_TOKENS = 256;
+const VOICE_MAX_OUTPUT_TOKENS = 4096;
 const REQUEST_TIMEOUT_MS = 30_000;
 const GEMINI_API_BASE =
   'https://generativelanguage.googleapis.com/v1beta/models';
@@ -17,42 +18,30 @@ interface GeminiGenerateResponse {
     content?: {
       parts?: Array<{ text?: string }>;
     };
+    finishReason?: string;
   }>;
 }
 
 @Injectable()
 export class GeminiClient {
   private readonly logger = new Logger(GeminiClient.name);
+  private readonly model: string;
+  private readonly apiKey: string;
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly promptBuilderService: PromptBuilderService,
+  ) {
+    this.model = this.configService.get<string>(envEnum.GEMINI_MODEL) ?? DEFAULT_GEMINI_MODEL;
+    this.apiKey = this.configService.get<string>(envEnum.GEMINI_API_KEY)!;
+  }
 
-  async generate(
+  async generateForText(
     context: AiPromptContext,
     textQuery: string,
-    intent: AiIntent,
   ): Promise<string | null> {
-    const apiKey = this.configService.get<string>(envEnum.GEMINI_API_KEY);
-    if (!apiKey) {
-      this.logger.warn(
-        'GEMINI_API_KEY is not configured; skipping Gemini fallback',
-      );
-      return null;
-    }
-
-    const model =
-      this.configService.get<string>(envEnum.GEMINI_MODEL) ??
-      DEFAULT_GEMINI_MODEL;
-    const temperature = this.parseNumber(
-      this.configService.get<string>(envEnum.AI_TEMPERATURE),
-      DEFAULT_TEMPERATURE,
-    );
-    const maxOutputTokens = this.parseNumber(
-      this.configService.get<string>(envEnum.AI_MAX_NEW_TOKENS),
-      DEFAULT_MAX_OUTPUT_TOKENS,
-    );
-    const systemInstruction = buildAssistantSystemPrompt(context, intent);
-    console.log('systemInstruction', systemInstruction);
-    const url = `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`;
+    const systemInstruction = buildAssistantSystemPrompt(context);
+    const url = `${GEMINI_API_BASE}/${this.model}:generateContent?key=${this.apiKey}`;
 
     try {
       const response = await this.fetchWithTimeout(url, {
@@ -65,15 +54,15 @@ export class GeminiClient {
           contents: [
             {
               role: 'user',
-              parts: [{ text: textQuery }],
+              parts: [
+                {
+                  text: this.promptBuilderService.buildVoiceUserMessage(textQuery),
+                },
+              ],
             },
           ],
           generationConfig: {
-            temperature,
-          //  maxOutputTokens,
-            // thinkingConfig: {
-            //   thinkingBudget: 0,
-            // },
+            temperature: DEFAULT_TEMPERATURE,
           },
         }),
       });
@@ -87,20 +76,66 @@ export class GeminiClient {
       }
 
       const data = (await response.json()) as GeminiGenerateResponse;
-
-      console.log('data', data);
-      console.log('data.candidates', data.candidates);
-      console.log('data.candidates[0]', data.candidates?.[0]);
-      console.log('data.candidates[0].content', data.candidates?.[0]?.content);
-      console.log('data.candidates[0].content.parts', data.candidates?.[0]?.content?.parts);
-      console.log('data.candidates[0].content.parts[0]', data.candidates?.[0]?.content?.parts?.[0]);
-      console.log('data.candidates[0].content.parts[0].text', data.candidates?.[0]?.content?.parts?.[0]?.text);
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      console.log('text', text);
       return text || null;
     } catch (error) {
       this.logger.error(
         `Gemini request error: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      return null;
+    }
+  }
+
+  async generateForVoice(
+    context: AiPromptContext,
+    textQuery: string,
+    language: LanguageEnum,
+  ): Promise<string | null> {
+    const systemInstruction = this.promptBuilderService.buildVoiceSystemPrompt({
+      context,
+      language,
+    });
+    const userMessage = this.promptBuilderService.buildVoiceUserMessage(textQuery);
+    const url = `${GEMINI_API_BASE}/${this.model}:generateContent?key=${this.apiKey}`;
+
+    try {
+      const response = await this.fetchWithTimeout(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: systemInstruction }],
+          },
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: userMessage }],
+            },
+          ],
+          generationConfig: {
+            temperature: DEFAULT_TEMPERATURE,
+            maxOutputTokens: VOICE_MAX_OUTPUT_TOKENS,
+            responseMimeType: 'application/json',
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        this.logger.error(
+          `Gemini voice inference failed: ${response.status} ${errorBody}`,
+        );
+        return null;
+      }
+
+      const data = (await response.json()) as GeminiGenerateResponse;
+      const candidate = data.candidates?.[0];
+      const text = candidate?.content?.parts?.[0]?.text?.trim();
+
+      return text || null;
+    } catch (error) {
+      this.logger.error(
+        `Gemini voice request error: ${error instanceof Error ? error.message : String(error)}`,
       );
       return null;
     }
@@ -118,11 +153,5 @@ export class GeminiClient {
     } finally {
       clearTimeout(timeout);
     }
-  }
-
-  private parseNumber(value: string | undefined, fallback: number): number {
-    if (!value) return fallback;
-    const parsed = Number(value);
-    return Number.isNaN(parsed) ? fallback : parsed;
   }
 }

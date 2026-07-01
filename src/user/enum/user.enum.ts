@@ -15,6 +15,7 @@ export enum MotherStageEnum {
 }
 
 export enum LanguageEnum {
+  English = 'English',
   Yoruba = 'Yoruba',
   Igbo = 'Igbo',
   Hausa = 'Hausa',

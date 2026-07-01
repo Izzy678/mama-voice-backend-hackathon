@@ -1,7 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserService } from '../../user/service/user.service';
 import { DashboardService } from '../../dashboard/service/dashboard.service';
-import type { AiPromptContext } from '../constants/ai-prompts';
+import {
+  type AiPromptContext,
+  resolveTrimester,
+} from '../constants/ai-prompts';
+import { MotherStageEnum } from '../../user/enum/user.enum';
 
 @Injectable()
 export class AiContextService {
@@ -23,6 +27,11 @@ export class AiContextService {
     }
 
     const dashboard = await this.dashboardService.getDashboard(userId);
+    const currentWeek = dashboard.currentWeek ?? null;
+    const trimester =
+      user.motherStage === MotherStageEnum.Pregnant && currentWeek != null
+        ? resolveTrimester(currentWeek)
+        : null;
 
     return {
       firstName: user.firstName ?? 'Mother',
@@ -30,6 +39,8 @@ export class AiContextService {
       state: user.state ?? '',
       lga: user.lga ?? '',
       statusText: dashboard.statusText,
+      currentWeek,
+      trimester,
       nextVaccineName: dashboard.nextVaccineName,
       daysToNextVaccine: dashboard.daysToNextVaccine,
     };

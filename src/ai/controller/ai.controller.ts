@@ -25,7 +25,7 @@ export class AiController {
 
   @Post('query')
   @UseGuards(AuthGuard)
-  @ApiOperation({ summary: 'Submit a text health query to MamaBot or Vax-Llama' })
+  @ApiOperation({ summary: 'Submit a text health query to the AI assistant' })
   @ApiBody({ type: AiQueryRequestDto })
   @ApiOkResponse({ type: AiQueryResponseDto })
   @ApiBadRequestResponse({
